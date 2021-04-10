@@ -1,0 +1,8 @@
+name: 'fenix-beta-version'
+description: 'Return the currrent Fenix Beta version. Fails if no beta could be found.'
+outputs:
+  fenix-beta-version:
+    description: "The major Fenix Beta version (like 88)."
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
