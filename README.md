@@ -10,9 +10,7 @@ Example usage:
       - name: "Discover Fenix Beta Version"
         id: fenix-beta-version
         uses: mozilla-mobile/fenix-beta-version@1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name "Print the version number"
         run: "The current Fenix Beta is $${{steps.fenix-beta-version.outputs.fenix-beta-version}}"
 ```

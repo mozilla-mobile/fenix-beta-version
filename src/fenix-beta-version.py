@@ -51,22 +51,22 @@ def is_fenix_beta_branch(fenix_repo, release_branch_name):
 
 if __name__ == "__main__":
 
-    github_access_token = os.getenv("GITHUB_TOKEN")
-    if not github_access_token:
-        print("No GITHUB_TOKEN set. Exiting.")
+    github = Github()
+    if github.get_user() is None:
+        print("[E] Could not get authenticated user. Exiting.")
         sys.exit(1)
 
-    github = Github(github_access_token)
-    if github.get_user() is None:
-        print("Could not get authenticated user. Exiting.")
-        sys.exit(1)
+    verbose = os.getenv("VERBOSE") == "true"
 
     organization = os.getenv("GITHUB_REPOSITORY_OWNER")
     if not organization:
-        print("No GITHUB_REPOSITORY_OWNER set. Exiting.")
+        print("[E] No GITHUB_REPOSITORY_OWNER set. Exiting.")
         sys.exit(1)
 
     fenix_repo = github.get_repo(f"{organization}/fenix")
+
+    if verbose:
+        print(f"[I] Looking at Fenix at {fenix_repo.full_name}")
 
     #
     # Actual Action logic starts here. The strategy is very simple:
@@ -77,12 +77,16 @@ if __name__ == "__main__":
 
     latest_fenix_version = get_latest_fenix_version(fenix_repo)
     if not latest_fenix_version:
-        print(f"Could not determine current A-C version on {organization}/fenix")
+        print(f"[E] Could not determine current A-C version on {organization}/fenix")
         sys.exit(1)
 
     branch_name = f"releases_v{latest_fenix_version}.0.0"
+
+    if verbose:
+        print(f"[I] Looking at Fenix branch {organization}/fenix:{branch_name}")
+
     if not is_fenix_beta_branch(fenix_repo, branch_name):
-        print(f"Branch {organization}/fenix:{branch_name} is not in beta")
+        print(f"[E] Branch {organization}/fenix:{branch_name} is not in beta")
         sys.exit(1)
 
     print(f"::set-output name=fenix-beta-version::{latest_fenix_version}")
