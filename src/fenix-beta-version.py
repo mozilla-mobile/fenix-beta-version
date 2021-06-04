@@ -86,8 +86,8 @@ if __name__ == "__main__":
         print(f"[I] Looking at Fenix branch {organization}/fenix:{branch_name}")
 
     if not is_fenix_beta_branch(fenix_repo, branch_name):
-        print(f"[E] Branch {organization}/fenix:{branch_name} is not in beta")
-        sys.exit(1)
+        print(f"Branch {organization}/fenix:{branch_name} is not in beta; returning an empty version")
+        latest_fenix_version = ""
 
     print(f"::set-output name=fenix-beta-version::{latest_fenix_version}")
 
