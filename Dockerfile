@@ -7,5 +7,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/* ./
 
-ENTRYPOINT ["/usr/src/app/fenix-beta-version.py"]
+ENTRYPOINT ["/usr/src/app/extract-major-beta-version.py"]
 
