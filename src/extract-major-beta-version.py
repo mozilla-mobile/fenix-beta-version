@@ -16,19 +16,19 @@ from github import Github, InputGitAuthor, enable_console_debug_logging
 
 
 def major_version_from_release_branch_name(branch_name):
-    if matches := re.match(r"^releases[_/]v(\d+)\.0\.0$", branch_name):
+    if matches := re.match(r"^releases_v(\d+)\.0($|.0$)", branch_name):
         return int(matches[1])
     raise Exception(f"Unexpected release branch name: {branch_name}")
 
 
 def get_release_branches(repo):
     return [branch.name for branch in repo.get_branches()
-            if re.match(r"^releases[_/]v\d+\.0\.0$", branch.name)]
+            if re.match(r"^releases_v\d+\.0($|.0$)", branch.name)]
 
 
-def get_latest_beta_major_version(repo):
+def get_latest_release_major_version(repo):
     major_versions = [major_version_from_release_branch_name(branch_name)
-                            for branch_name in get_release_branches(repo)]
+                      for branch_name in get_release_branches(repo)]
     if len(major_versions) > 0:
         return sorted(major_versions, reverse=True)[0]
 
@@ -37,10 +37,17 @@ def is_beta_version(version):
     return re.compile(r'\d+.0.0-beta.\d+', re.MULTILINE).match(version)
 
 
-def is_beta_branch(repository, release_branch_name):
-    """Fetch version.txt from the given branch and throw an exception if it is not a Beta release"""
-    content_file = repository.get_contents("version.txt", ref=release_branch_name)
-    version = content_file.decoded_content.decode('utf8')
+def is_beta_branch(repository, branch_major_version):
+    # Fetch version.txt from either "<branch_major_version>.0" branch either "<branch_major_version>.0.0" branch.
+
+    try:
+        content_file = repository.get_contents("version.txt", ref=f"releases_v{branch_major_version}.0")
+        # The below call can throw a GithubException if the file cannot be found.
+        version = content_file.decoded_content.decode('utf8')
+    except:
+        content_file = repository.get_contents("version.txt", ref=f"releases_v{branch_major_version}.0.0")
+        version = content_file.decoded_content.decode('utf8')
+
     return is_beta_version(version)
 
 
@@ -72,22 +79,17 @@ if __name__ == "__main__":
     # - Look at version.txt to make sure that branch is actually in Beta
     #
 
-    last_beta_major_version = get_latest_beta_major_version(repository)
-    if not last_beta_major_version:
-        print(f"[E] Could not determine the latest beta branch of \"{repository}\"")
+    latest_release_major_version = get_latest_release_major_version(repository)
+    if not latest_release_major_version:
+        print(f"[E] Could not determine the latest release branch of \"{repository}\"")
         sys.exit(1)
 
-    branch_name = f"releases_v{last_beta_major_version}.0.0"
+    if not is_beta_branch(repository, latest_release_major_version):
+        print(f"Release version \"{latest_release_major_version}\" is not in beta; returning an empty version")
+        latest_release_major_version = ""
 
     if verbose:
-        print(f"[I] Looking at branch \"{repository}:{branch_name}\"")
+        print(f"[I] Latest major beta version is: \"{latest_release_major_version}\"")
 
-    if not is_beta_branch(repository, branch_name):
-        print(f"Branch \"{repository}:{branch_name}\" is not in beta; returning an empty version")
-        last_beta_major_version = ""
-
-    if verbose:
-        print(f"[I] Latest major beta version is: \"{last_beta_major_version}\"")
-
-    print(f"::set-output name=beta_version::{last_beta_major_version}")
+    print(f"::set-output name=beta_version::{latest_release_major_version}")
 
