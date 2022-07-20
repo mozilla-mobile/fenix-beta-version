@@ -8,6 +8,7 @@
 import os, re, sys
 
 from github import Github, InputGitAuthor, enable_console_debug_logging
+from mozilla_version.mobile import MobileVersion
 
 
 #
@@ -34,7 +35,7 @@ def get_latest_release_major_version(repo):
 
 
 def is_beta_version(version):
-    return re.compile(r'\d+.0.0-beta.\d+', re.MULTILINE).match(version)
+    return MobileVersion.parse(version).is_beta
 
 
 def is_beta_branch(repository, branch_major_version):
