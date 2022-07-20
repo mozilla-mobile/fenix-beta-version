@@ -38,5 +38,5 @@ This _GitHub Action_ is used in in
 Just run the following command line. You may need to change the python version to follow what is in `Dockerfile`.
 
 ```
-docker run -t -v "$PWD:/src" -w /src python:3.9 bash -cx "pip install pip-tools && cd /src/ && pip-compile --upgrade --output-file requirements.txt requirements.in"
+docker run -t -v "$PWD:/src" -w /src python:3.9 bash -cx "pip install pip-tools && cd /src/ && pip-compile --upgrade --generate-hashes --output-file requirements.txt requirements.in"
 ```
