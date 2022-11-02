@@ -1,5 +1,9 @@
 name: 'extract-major-beta-version'
 description: 'Return the current _major beta version_. Fails if no beta could be found.'
+inputs:
+  project:
+    description: 'The project subdirectory to work on - fenix, focus-android.'
+    required: true
 outputs:
   beta_version:
     description: "The last major version of a beta release (like 88)."

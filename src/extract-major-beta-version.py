@@ -38,15 +38,15 @@ def is_beta_version(version):
     return MobileVersion.parse(version).is_beta
 
 
-def is_beta_branch(repository, branch_major_version):
+def is_beta_branch(repository, project_path, branch_major_version):
     # Fetch version.txt from either "<branch_major_version>.0" branch either "<branch_major_version>.0.0" branch.
 
     try:
-        content_file = repository.get_contents("version.txt", ref=f"releases_v{branch_major_version}.0")
+        content_file = repository.get_contents(f"{project_path}/version.txt", ref=f"releases_v{branch_major_version}.0")
         # The below call can throw a GithubException if the file cannot be found.
         version = content_file.decoded_content.decode('utf8')
     except:
-        content_file = repository.get_contents("version.txt", ref=f"releases_v{branch_major_version}.0.0")
+        content_file = repository.get_contents(f"{project_path}/version.txt", ref=f"releases_v{branch_major_version}.0.0")
         version = content_file.decoded_content.decode('utf8')
 
     return is_beta_version(version)
@@ -70,6 +70,11 @@ if __name__ == "__main__":
         print("[E] No GITHUB_REPOSITORY set. Exiting.")
         sys.exit(1)
 
+    project_path = os.environ.get("INPUT_PROJECT")
+    if project_path is None:
+        print("[E] Empty INPUT_PROJECT. Exiting.")
+        sys.exit(1)
+
     if verbose:
         print(f"[I] Looking at the \"{repository}\" repository")
 
@@ -85,7 +90,7 @@ if __name__ == "__main__":
         print(f"[E] Could not determine the latest release branch of \"{repository}\"")
         sys.exit(1)
 
-    if not is_beta_branch(repository, latest_release_major_version):
+    if not is_beta_branch(repository, project_path, latest_release_major_version):
         print(f"Release version \"{latest_release_major_version}\" is not in beta; returning an empty version")
         latest_release_major_version = ""
 
