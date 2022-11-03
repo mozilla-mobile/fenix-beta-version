@@ -22,6 +22,8 @@ Example usage:
       - name: "Discover the last beta release major version"
         id: extract-major-beta-version
         uses: mozilla-mobile/extract-major-beta-version@3.0.0
+        with:
+          project: focus-android
 
       - name "Print the version number"
         run: "The current _major beta_ number is $${{steps.extract-major-beta-version.outputs.beta_version}}"
