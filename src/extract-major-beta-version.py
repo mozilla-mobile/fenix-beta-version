@@ -17,14 +17,14 @@ from mozilla_version.mobile import MobileVersion
 
 
 def major_version_from_release_branch_name(branch_name):
-    if matches := re.match(r"^releases_v(\d+)$)", branch_name):
+    if matches := re.match(r"^releases_v(\d+)$", branch_name):
         return int(matches[1])
     raise Exception(f"Unexpected release branch name: {branch_name}")
 
 
 def get_release_branches(repo):
     return [branch.name for branch in repo.get_branches()
-            if re.match(r"^releases_v\d+$)", branch.name)]
+            if re.match(r"^releases_v\d+$", branch.name)]
 
 
 def get_latest_release_major_version(repo):
