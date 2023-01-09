@@ -39,10 +39,10 @@ def is_beta_version(version):
 
 
 def is_beta_branch(repository, branch_major_version):
-    # Fetch version.txt from either "<branch_major_version>.0" branch either "<branch_major_version>.0.0" branch.
+    # Fetch version.txt from either "releases_v<branch_major_version>" or "releases_v<branch_major_version>.0.0" branch.
 
     try:
-        content_file = repository.get_contents("version.txt", ref=f"releases_v{branch_major_version}.0")
+        content_file = repository.get_contents("version.txt", ref=f"releases_v{branch_major_version}")
         # The below call can throw a GithubException if the file cannot be found.
         version = content_file.decoded_content.decode('utf8')
     except:
