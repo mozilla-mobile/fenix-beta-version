@@ -58,7 +58,7 @@ def is_beta_branch(repository, branch_major_version):
 
 if __name__ == "__main__":
 
-    github = Github()
+    github = Github(os.getenv("INPUT_TOKEN"))
     if github.get_user() is None:
         print("[E] Could not get authenticated user. Exiting.")
         sys.exit(1)
